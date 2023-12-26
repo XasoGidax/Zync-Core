@@ -1,1 +1,32 @@
+#          Welcome To Zync Core(v1.0)
+#              Made By @XasoGidax
+#  Need Help Or Want To Report A Bug Join The Discord 
+#         https://discord.gg/WmKEM7w3jr
+#         Thank You For Using Zync Core!!!
+#       Remember To Follow The License Rules
 
+
+options: # Use "True" Or "False" To Enable Or Disable
+    Title: Zync Core #Change To Name Of Server Or Server Ip WIll Be Shown AT Top Of Scoreboard
+    Ip: Default #Change To Server Ip
+    HidePlugins: true #If True Zync Core Will Be The Only Plugin WHen Doing /pl or /Plugins
+    CustomJoinMessage: false #If True Will Change The Join Message
+    CustomLeaveMessage: false #If True Will Change The Leave Message
+    CustomDeathMessage: false #If True Will Change The Death Message
+    NightVisonOnJoin: false #If True Will Give Night Vision On Join
+    AnnounceTitle: &c&l[!]&r #This will be the title when you do /announce or /announce
+    PrefixCoulor: &b #Please use in format &4 etc will be coulor at the start of announcements like REvive etc
+    ScoreBoardCoulor: &2 #Please use in format &4 etc will be coulor of scoreboard stuff
+
+    on load:
+        send "" to console
+        send "     Bing Bong" to console
+        send "" to console
+        send "                 &7Succesfully loaded Zync Core!" to console
+        send "" to console
+        play sound "minecraft:block.end_portal.spawn" at volume 100 to player
+        send "" to all players
+        send "     Bing Bong" to all players
+        send "" to all players
+        send "                 &7Succesfully loaded Zync Core!" to all players
+        send "" to all players
