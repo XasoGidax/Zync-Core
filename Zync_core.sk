@@ -13,12 +13,17 @@ options: # Use "True" Or "False" To Enable Or Disable
     CustomJoinMessage: false #If True Will Change The Join Message
     CustomLeaveMessage: false #If True Will Change The Leave Message
     CustomDeathMessage: false #If True Will Change The Death Message
-    NightVisonOnJoin: false #If True Will Give Night Vision On Join
+    NightVisonOnJoin: true #If True Will Give Night Vision On Join
     AnnounceTitle: &c&l[!]&r #This will be the title when you do /announce or /announce
     PrefixCoulor: &b #Please use in format &4 etc will be coulor at the start of announcements like REvive etc
     ScoreBoardCoulor: &2 #Please use in format &4 etc will be coulor of scoreboard stuff
+    SkipsOnJoin: 0 #amount of skips players have when they join
+    RevivesOnJoin: 0 #amount of revives players have when they join
+    MuteNosises: false #If True Will Mute All Nosises Such As When A Player Joins
+    PlayerJoinAlive: false #if true players will join as alive
 
-    on load:
+on load:
+    if {@MuteNosises} is false:
         send "" to console
         send "     Bing Bong" to console
         send "" to console
@@ -30,3 +35,103 @@ options: # Use "True" Or "False" To Enable Or Disable
         send "" to all players
         send "                 &7Succesfully loaded Zync Core!" to all players
         send "" to all players
+    if {@MuteNosises} is true:
+        send "" to console
+        send "                 &7Succesfully loaded Zync Core!" to console
+        send "" to console
+        send "" to all players
+        send "                 &7Succesfully loaded Zync Core!" to all players
+        send "" to all players
+        send "Dont Forget To Change The Options In The Zync Core Skript!" to all players
+
+on join:
+    set {skips::%player's uuid%} to {@SkipsOnJoin}
+    set {revivaltokens::%player's uuid%} to {@RevivesOnJoin}
+    if {@PlayerJoinAlive} is true:
+        if {dead::*} contains player:
+            remove {dead::*} from player
+        if {alive::*} does not contain player:
+            add {alive::*} to player
+            set {status::%player's uuid%} to "&aAlive"
+    if {@playerJoinAlive} is false:
+        if {alive::*} contains player:
+            remove {alive::*} from player
+        if {dead::*} does not contain player:
+            add {dead::*} to player
+            set {status::%player's uuid%} to "&cDead"
+    teleport player to {spawn}
+    if {@NightVisonOnJoin} is true:
+        apply night vision without particles to player for 1 year
+    while player is online:
+        set title of player's scoreboard to "{@Title}"
+        set line 16 of player's scoreboard to ""
+        set line 15 of player's scoreboard to "{@ScoreBoardCoulor}Weclome: %player%"
+        set line 14 of player's scoreboard to ""
+        set line 13 of player's scoreboard to "{@ScoreBoardCoulor}&lPlayer:"
+        set line 12 of player's scoreboard to "&8•&5Tokens: {@ScoreBoardCoulor}%{revivaltokens::%player's uuid%}%"
+        set line 11 of player's scoreboard to "&8•&5Skips: {@ScoreBoardCoulor}%{skips::%player's uuid%}%"
+        set line 10 of player's scoreboard to "&8•&5Status: {@ScoreBoardCoulor}%{status::%player's uuid%}%"
+        set line 9 of player's scoreboard to "&8•&5Status: {@ScoreBoardCoulor}%{status::%player's uuid%}%"
+        set line 8 of player's scoreboard to "{@ScoreBoardCoulor}&lEvent:"
+        set line 7 of player's scoreboard to "&8•&5Event: {@ScoreBoardCoulor}%{event::*}%"
+        set line 6 of player's scoreboard to "&8•&5Alive: {@ScoreBoardCoulor}%size of {alive::*}%"
+        set line 5 of player's scoreboard to "{@ScoreBoardCoulor}&lServer:"
+        set line 4 of player's scoreboard to "&8•&5Online: {@ScoreBoardCoulor}%size of all players%"
+        set line 3 of player's scoreboard to "&8•&5Dead: {@ScoreBoardCoulor}%size of {dead::*}%"
+        set line 2 of player's scoreboard to ""
+        set line 4 of player's scoreboard to "&8•&5IP: {@ScoreBoardCoulor}{@Ip}"
+        wait 1 tick
+      
+on join:
+    if {@CustomJoinMessage} is true:
+        send "" to all players
+        send "{@PrefixCoulor}&l %player% has joined the server!" to all players
+        play sound "minecraft:block.note_block.pling" at pitch 2 to all players
+
+on first join:
+    add 1 to {uniqueplayers}
+
+on join:
+    wait 1 tick
+    if {hide} is true:
+        hide all players from player
+        loop all players where [input has permission "zynccore.admin"]:
+            show loop-player to all players
+            show all players to loop-player
+
+on leave:
+    if {@CustomLeaveMessage} is true:
+        send "" to all players
+        send "{@PrefixCoulor}&l %player% has left the server!" to all players
+        play sound "minecraft:block.note_block.pling" to all players
+    remove player from {alive::*}
+    remove player from {dead::*}
+    remove player from {recentrevive::*}
+
+on death of player:
+    if {@CustomDeathMessage} is true:
+        send "" to all players
+        send "{@PrefixCoulor}&l %player% has died!" to all players
+        play sound "minecraft:block.note_block.pling" at pitch 0.5 to all players
+    if victim contains {alive::*}:
+        remove {alive::*} from victim
+        add {dead::*} to victim
+    if victim does not contain {dead::*}:
+        add {dead::*} to victim
+    if {recentrevive::*} does not contain victim:
+        add victim to {recentrevive::*}
+        wait 30 seconds
+        remove victim from {recentrevive::*}
+
+on respawn:
+    if {@nightvisononjoin} is true:
+        apply night vision without particles to player for 1 year
+        set respawn location of player to {spawn}
+        wait 1 tick
+    set respawn location to {spawn}
+
+
+
+
+
+
