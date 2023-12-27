@@ -21,6 +21,7 @@ options: # Use "True" Or "False" To Enable Or Disable
     RevivesOnJoin: 0 #amount of revives players have when they join
     MuteNosises: false #If True Will Mute All Nosises Such As When A Player Joins
     PlayerJoinAlive: false #if true players will join as alive
+    DisableOpCommand: true #if true will stop people from running the /op command and only the console can do it
 
 on load:
     if {@MuteNosises} is false:
@@ -64,17 +65,18 @@ on join:
         apply night vision without particles to player for 1 year
     while player is online:
         set title of player's scoreboard to "{@Title}"
-        set line 16 of player's scoreboard to ""
-        set line 15 of player's scoreboard to "{@ScoreBoardCoulor}Weclome: %player%"
-        set line 14 of player's scoreboard to ""
-        set line 13 of player's scoreboard to "{@ScoreBoardCoulor}&lPlayer:"
-        set line 12 of player's scoreboard to "&8•&5Tokens: {@ScoreBoardCoulor}%{revivaltokens::%player's uuid%}%"
-        set line 11 of player's scoreboard to "&8•&5Skips: {@ScoreBoardCoulor}%{skips::%player's uuid%}%"
-        set line 10 of player's scoreboard to "&8•&5Status: {@ScoreBoardCoulor}%{status::%player's uuid%}%"
-        set line 9 of player's scoreboard to "&8•&5Status: {@ScoreBoardCoulor}%{status::%player's uuid%}%"
-        set line 8 of player's scoreboard to "{@ScoreBoardCoulor}&lEvent:"
-        set line 7 of player's scoreboard to "&8•&5Event: {@ScoreBoardCoulor}%{event::*}%"
-        set line 6 of player's scoreboard to "&8•&5Alive: {@ScoreBoardCoulor}%size of {alive::*}%"
+        set line 17 of player's scoreboard to ""
+        set line 16 of player's scoreboard to "{@ScoreBoardCoulor}Weclome: %player%"
+        set line 15 of player's scoreboard to ""
+        set line 14 of player's scoreboard to "{@ScoreBoardCoulor}&lPlayer:"
+        set line 13 of player's scoreboard to "&8•&5Tokens: {@ScoreBoardCoulor}%{revivaltokens::%player's uuid%}%"
+        set line 12 of player's scoreboard to "&8•&5Skips: {@ScoreBoardCoulor}%{skips::%player's uuid%}%"
+        set line 11 of player's scoreboard to "&8•&5Status: {@ScoreBoardCoulor}%{status::%player's uuid%}%"
+        set line 10 of player's scoreboard to ""
+        set line 9 of player's scoreboard to "{@ScoreBoardCoulor}&lEvent:"
+        set line 8 of player's scoreboard to "&8•&5Event: {@ScoreBoardCoulor}%{event::*}%"
+        set line 7 of player's scoreboard to "&8•&5Alive: {@ScoreBoardCoulor}%size of {alive::*}%"
+        set line 6 of player's scoreboard to "&8&5Event Status: {@ScoreBoardCoulor}%{eventstatus::*}%"
         set line 5 of player's scoreboard to "{@ScoreBoardCoulor}&lServer:"
         set line 4 of player's scoreboard to "&8•&5Online: {@ScoreBoardCoulor}%size of all players%"
         set line 3 of player's scoreboard to "&8•&5Dead: {@ScoreBoardCoulor}%size of {dead::*}%"
@@ -118,6 +120,7 @@ on death of player:
         add {dead::*} to victim
     if victim does not contain {dead::*}:
         add {dead::*} to victim
+        set {status::%player's uuid%} to "&4Dead"
     if {recentrevive::*} does not contain victim:
         add victim to {recentrevive::*}
         wait 30 seconds
@@ -130,8 +133,1043 @@ on respawn:
         wait 1 tick
     set respawn location to {spawn}
 
+on chat:
+    if {mute} is true:
+        if player has permission "zynccore.admin":
+        
+        else:
+            cancel event
+            send "{@PrefixCoulor}&lChat is currently muted!" to player
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+            
+on damage:
+    if player has permission "zynccore.admin":
+
+    else:
+        if {pvp} is false:
+            cancel event
+            send "{@PrefixCoulor}&lPvp is currently disabled!" to player
+        else:
+
+on break:
+    if player has permission "zynccore.admin":
+
+    else:
+        if {break} is false:
+            cancel event
+            send "{@PrefixCoulor}&lBreaking is currently disabled!" to player
+        else:
+
+on build:
+    if player has permission "zynccore.admin":
+    
+    else:
+        if {build} is false:
+            cancel event
+            send "{@PrefixCoulor}&lBuilding is currently disabled!" to player
+        else:
+
+on block spread:
+    if {flowing} is false:
+        if event-block is water or event-block is lava:
+            cancel event
+    else:
+
+on falldamage:
+    if {falldamage} is false:
+        cancel event
+
+#COMMANDS
+
+command /mutechat:
+    permission: zynccore.admin
+    permission message: "zynccore.admin
+    trigger:
+        if {mute} is true:
+            set {mute} to false
+            send "{@PrefixCoulor}&lChat has been unmuted!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {mute} is false:
+            set {mute} to true
+            send "{@PrefixCoulor}&lChat has been muted!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /announce [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou do not have permission to use this command!
+    trigger:
+        send title "{@AnnounceTitle}" with subtitle "{@PrefixCoulor}%arg 1%" to all players
+
+command /hunger:
+    permission: zynccore.admin
+    permission message: &cYou do not have permission to use this command!
+    trigger:
+        if {hunger} is false:
+            set {hunger} to true
+            send "{@PrefixCoulor}&lHunger has been enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+            set saturation of all players to 1
+        if {hunger} is true:
+            set {hunger} to false
+            send "{@PrefixCoulor}&lHunger has been disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+            set saturation of all players to 20
+
+command /pvp:
+    permission: zynccore.admin
+    permission message: &cYou do not have permission to use this command!
+    trigger:
+        if {pvp} is false:
+            set {pvp} to true
+            send "{@PrefixCoulor}&lPvp has been enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {pvp} is true:
+            set {pvp} to false
+            send "{@PrefixCoulor}&lPvp has been disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /break:
+    permission: zynccore.admin
+    permission message: &cYou do not have permission to use this command!
+    trigger:
+        if {break} is false:
+            set {break} to true
+            send "{@PrefixCoulor}&lBreak has been enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {break} is true:
+            set {break} to false
+            send "{@PrefixCoulor}&lBreak has been disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /build:
+    permission: zynccore.admin
+    permission message: &cYou do not have permission to use this command!
+    trigger:
+        if {build} is false:
+            set {build} to true
+            send "{@PrefixCoulor}&lBuild has been enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {build} is true:
+            set {build} to false
+            send "{@PrefixCoulor}&lBuild has been disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /timer [<integer>] [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 or arg-2 is not set:
+            send "{@PrefixCoulor}&lPlease Use /timer <Amount Of Time> <Seconds/Minutes>" to player
+        else:
+            set {timer} to true
+            if arg-1 is an integer:
+                if {_time} isnt set:
+                    if arg-2 is "seconds" or "second":
+                        set {_time} to arg-1
+                        while {_time} > 0:
+                            send action bar "{@PrefixCoulor}&lTimer: &c%{_time}% &lSeconds" to all players
+                            play sound "minecraft:block.note_block.pling" at volume 100 at pitch 2 to all players
+                            wait 1 second
+                            remove 1 from {_time}
+                        broadcast "{@PrefixCoulor}&lTimer Has Ended!" to all players
+                        play sound "minecraft:block.end_portal.spawn" at volume 100 at pitch 2 to all players
+                        delete {_time}
+                    if arg-2 is "minute" or "minutes":
+                        set {_time} to arg-1
+                        while {_time} > 0:
+                            send action bar "{@PrefixCoulor}&lTimer: &c%{_time}% &lMinutes" to all players
+                            play sound "minecraft:block.note_block.pling" at volume 100 at pitch 2 to all players
+                            wait 1 minute
+                            remove 1 from {_time}
+                        broadcast "{@PrefixCoulor}&lTimer Has Ended!" to all players
+                        play sound "minecraft:block.end_portal.spawn" at volume 100 at pitch 2 to all players
+                    else:
+                        send "{@PrefixCoulor}Stop: &cPlease Specify if you want the timer in seconds or minutes" to player
+                        play sound "minecraft:block.note_block.bass" at volume 100 to player
+                else:
+                    send "{@PrefixCoulor}&lStop: &cPlease Specify A Number!" to player
+                    play sound "minecraft:block.note_block.bass" at volume 100 to player
+            else:
+                send "{@PrefixCoulor}&lStop: &cYou Already Have A Timer Going Just &lWAIT" to player
+                play sound "minecraft:block.note_block.bass" at volume 100 to player
+        else:
+            send "{@PrefixCoulor}&lStop: &cPlease Specify A Number!" to player
+            play sound "minecraft:block.note_block.bass" at volume 100 to player
+
+command /spawnlocationset:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        set {spawn} to location of player
+        send "{@PrefixCoulor}&lSpawn Location Set!" to player
+        play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /spawn:
+    trigger:
+        teleport player to {spawn}
+        send "{@PrefixCoulor}&lTeleported To Spawn!" to player
+        play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if player contains {alive::*}:
+            remove {alive::*} from player
+        if player does not contain {dead::*}:
+            add {dead::*} to player
+        if {recentrevive::*} does not contain player:
+            add player to {recentrevive::*}
+            wait 30 seconds
+            remove player from {recentrevive::*}
+
+command /revive [<player>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is a player:
+            teleport arg-1 to player
+            if player contains {dead::*}:
+                remove {dead::*} from player
+            if player does not contain {alive::*}:
+                add {alive::*} to player
+            
+command /reviveall [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if size of {dead::*} is bigger than 0:
+            if arg-1 isnt set:
+                loop players that contain {dead::*}:
+                    teleport loop-player to player
+                    if loop-player contains {dead::*}:
+                        remove {dead::*} from loop-player
+                    if loop-player does not contain {alive::*}:
+                        add {alive::*} to loop-player
+            f arg-1 is "fast":
+                loop players that contain {dead::*}:
+                    teleport loop-player to player
+                    if loop-player contains {dead::*}:
+                        remove {dead::*} from loop-player
+                    if loop-player does not contain {alive::*}:
+                        add {alive::*} to loop-player
+            if arg-1 is "slow":
+                loop players that contain {dead::*}:
+                    teleport loop-player to player
+                    if loop-player contains {dead::*}:
+                        remove {dead::*} from loop-player
+                    if loop-player does not contain {alive::*}:
+                        add {alive::*} to loop-player
+                    wait 1 tick
+            
+command /reviverecent:
+    permission: zyncore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if size of {reviverecent::*} is bigger than 0:
+            add {reviverecent::*} to {alive::*}
+            remove {recentrevive::*} from {dead::*}
+            teleport players in {recentrevive::*} to sender
+        loop all players:
+            if {recentrevive::*} contains loop-player:
+                remove loop-player from {recentrevive::*}
+                add loop-player to {alive::*}
+                remove loop-player from {dead::*}
+
+#KILLS
+
+command /kill [<player>]:
+    permission: zyncore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is a player:
+            kill arg-1
+            send "{@PrefixCoulor}&lYou Have Killed %arg 1%!" to player
+            send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to arg-1
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player and arg-1
+        else:
+            send "{@PrefixCoulor}&lPlease Specify A Player!" to player
+
+command /killall [<text>]:
+    permission: zyncore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is "fast":
+            loop all players:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+        if arg-1 is "slow":
+            loop all players:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+                wait 1 tick
+        else:
+            loop all players:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+
+command /killalive [<text>]:
+    permission: zyncore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is "fast":
+            loop all players that contain {alive::*}:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+        if arg-1 is "slow":
+            loop all players that contain {alive::*}:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+                wait 1 tick
+        else:
+            loop all players that contain {alive::*}:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+
+command /killdead [<text]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is "fast":
+            loop all players that contain {dead::*}:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+        if arg-1 is "slow":
+            loop all players that contain {dead::*}:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+                wait 1 tick
+        else:
+            loop all players that contain {dead::*}:
+                kill loop-player
+                send "{@PrefixCoulor}&lYou Have Killed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Killed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+
+#TELEPORTS
+
+command /tpdead [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is "fast":
+            loop all players that contain {dead::*}:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+        if arg-1 is "slow":
+            loop all players that contain {dead::*}:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+                wait 1 tick
+        else:
+            loop all players that contain {dead::*}:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+
+command /tpalive [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is "fast":
+            loop all players that contain {alive::*}:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+        if arg-1 is "slow":
+            loop all players that contain {alive::*}:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+                wait 1 tick
+        else:
+            loop all players that contain {alive::*}:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+
+command /tpall [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is "fast":
+            loop all players:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+        if arg-1 is "slow":
+            loop all players:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+                wait 1 tick
+        else:
+            loop all players:
+                teleport loop-player to player
+                send "{@PrefixCoulor}&lYou Have Teleported %loop-player% To You!" to player
+                send "{@PrefixCoulor}&lYou Have Been Teleported To %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+
+#Disable Powerfull Commands
+
+command /op [<player>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if {@DisableOpCommand} is true:
+            send "{@PrefixCoulor}&lStop&r For Saftey This Command Can Only Be Done By The Console" to player
+        else:
+            if arg-1 is a player:
+                op arg-1
+                send "{@PrefixCoulor}&lYou Have Opped %arg 1%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Opped By %player%!" to arg-1
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and arg-1
+            else:
+                send "{@PrefixCoulor}&lPlease Specify A Player!" to player
+        
+command /plugins:
+    aliases: pl
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if {@HidePlugins} is true:
+            send "{@PrefixCoulor}&lPlugins: &cZync Core Download at <link:https://www.spigotmc.org/resources/zync-core.114141/>" to player
+        else:
+            send "{@PrefixCoulor}&lPlugins: &c%plugins%" to player
+
+#stuff
+
+command /clearchat:
+    description: Clear chat for all players
+    permission: cc.clear
+    trigger:
+        loop 300 times:
+            broadcast " "
+        broadcast " "
+        broadcast "&4Chat has been cleared by %player%!"
+        broadcast " "
+
+command /smite [<player>] [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is a player:
+            strike lightning at arg-1
+            send "{@PrefixCoulor}&lYou Have Smited %arg 1%!" to player
+            send "{@PrefixCoulor}&lYou Have Been Smited By %player%!" to arg-1
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player and arg-1
+        else:
+            send "{@PrefixCoulor}&lPlease Specify A Player!" to player
+
+command /heal [<player>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is a player:
+            set health of arg-1 to 20
+            send "{@PrefixCoulor}&lYou Have Healed %arg 1%!" to player
+            send "{@PrefixCoulor}&lYou Have Been Healed By %player%!" to arg-1
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player and arg-1
+        else:
+            set health of player to 20
+            send "{@PrefixCoulor}&lYou Have Healed Yourself!" to player
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /healall [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is "fast":
+            loop all players:
+                set health of loop-player to 20
+                send "{@PrefixCoulor}&lYou Have Healed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Healed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+        if arg-1 is "slow":
+            loop all players:
+                set health of loop-player to 20
+                send "{@PrefixCoulor}&lYou Have Healed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Healed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+                wait 1 tick
+        else:
+            loop all players:
+                set health of loop-player to 20
+                send "{@PrefixCoulor}&lYou Have Healed %loop-player%!" to player
+                send "{@PrefixCoulor}&lYou Have Been Healed By %player%!" to loop-player
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player and loop-player
+
+command /hide [<text>] [<player>]:
+    trigger:
+        if arg-1 is "all":
+            if arg-2 isn't set:
+                if {visibility::%player%} is set:
+                    if {hidelock} isn't set:
+                        delete {visibility::%player%}
+                        clear {hiddenplayers::%player%::*}
+                        reveal all players to player
+                        send "%nl%{@PrefixColor}&lHIDE:&7 Succesfully revealed all players!%nl%"
+                        play sound "minecraft:block.note_block.bell" at volume 100 to player
+                    else:
+                        send "%nl%{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!%nl%"
+                        play sound "minecraft:block.note_block.bass" at volume 100 to player
+                else:
+                    if {hidelock} isn't set:
+                        clear {hiddenplayers::%player%::*}
+                        hide all players from player
+                        set {visbility::%player%} to true
+                        add all players to {visibility::%player%::*}
+                        send "%nl%{@PrefixColor}&lHIDE:&7 You have succesfully hidden everyone!%nl%"
+                        play sound "minecraft:block.note_block.bell" at volume 100 to player
+                    else:
+                        send "%nl%{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!%nl%"
+                        play sound "minecraft:block.note_block.bass" at volume 100 to player
+        if arg-1 isn't set:
+            if arg-2 isn't set:
+                if {visibility::%player%} is set:
+                    if {hidelock} isn't set:
+                        delete {visibility::%player%}
+                        clear {hiddenplayers::%player%::*}
+                        reveal all players to player
+                        send "%nl%{@PrefixColor}&lHIDE:&7 You have revealed everyone!%nl%"
+                        play sound "minecraft:block.note_block.bell" at volume 100 to player
+                    else:
+                        send "%nl%{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!%nl%"
+                        play sound "minecraft:block.note_block.bass" at volume 100 to player
+                else:
+                    if {hidelock} isn't set:
+                        clear {hiddenplayers::%player%::*}
+                        hide all players from player
+                        loop all players where [input has permission "lazycore.admin"]:
+                            reveal loop-player-1 to player
+                        set {visibility::%player%} to true
+                        add all players to {visibility::%player%::*}
+                        send "%nl%{@PrefixColor}&lHIDE:&7 You have hidden everyone except staff!%nl%"
+                        play sound "minecraft:block.note_block.bell" at volume 100 to player
+                    else:
+                        send "%nl%{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!%nl%"
+                        play sound "minecraft:block.note_block.bass" at volume 100 to player
+        if arg-1 isn't set:
+            if arg-2 is set:
+                if {visibility::%player%} is set:
+                    if {hiddenplayers2::%player%::*} doesn't contain arg-2:
+                        if {hidelock} isn't set:
+                            add arg-2 to {hiddenplayers2::%player%::*}
+                            reveal arg-2 to sender
+                            send ""
+                            send "{@PrefixColor}&lHIDE:&7 You have revealed &f%arg-2%&7!"
+                            send ""
+                            play sound "minecraft:block.note_block.bell" at volume 100 to player
+                        else:
+                            send ""
+                            send "{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!"
+                            send ""
+                            play sound "minecraft:block.note_block.bass" at volume 100 to player
+                    else if {hiddenplayers2::%player%::*} contains arg-2:
+                        if {hidelock} isn't set:
+                            remove arg-2 from {hiddenplayers2::%player%::*}
+                            hide arg-2 from sender
+                            send ""
+                            send "{@PrefixColor}&lHIDE:&7 You have hidden &f%arg-2%&7!"
+                            send ""
+                            play sound "minecraft:block.note_block.bell" at volume 100 to player
+                        else:
+                            send ""
+                            send "{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!"
+                            send ""
+                            play sound "minecraft:block.note_block.bass" at volume 100 to player
+                if {hiddenplayers::%player%::*} doesn't contain arg-2:
+                    if {visibility::%player%} isn't set:
+                        if {hidelock} isn't set:
+                            add arg-2 to {hiddenplayers::%player%::*}
+                            hide arg-2 from sender
+                            send ""
+                            send "{@PrefixColor}&lHIDE:&7 You have succesfully hidden &f%arg-2%&7!"
+                            send ""
+                            play sound "minecraft:block.note_block.bell" at volume 100 to player
+                        else:
+                            send ""
+                            send "{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!"
+                            send ""
+                            play sound "minecraft:block.note_block.bass" at volume 100 to player
+                    else if {hiddenplayers::%player%::*} contains arg-2:
+                        if {visibility::%player%} isn't set:
+                            if {hidelock} isn't set:
+                                remove arg-2 from {hiddenplayers::%player%::*}
+                                reveal arg-2 to sender
+                                send ""
+                                send "{@PrefixColor}&lHIDE:&7 You have revealed &f%arg-2%&7!"
+                                send ""
+                                play sound "minecraft:block.note_block.bell" at volume 100 to player
+                            else:
+                                send ""
+                                send "{@PrefixColor}&lHIDE:&7 You cannot use &f/hide&7 at the moment!"
+                                send ""
+                                play sound "minecraft:block.note_block.bass" at volume 100 to player
+        if arg-1 is "host":
+            if player has permission "lazycore.admin":
+                if {hidelock} isn't set:
+                    set {hidelock} to true
+                    hide all players from all players
+                    loop all players:
+                        loop all players where [input has permission "lazycore.admin"]:
+                            reveal loop-player-2 to all players
+                            reveal all players to loop-player-2
+                    broadcast ""
+                    broadcast "{@PrefixColor}&lHIDE: &f%sender%&7 has hidden everyone except staff from everyone!"
+                    broadcast ""
+                    play sound "minecraft:block.note_block.bell" at volume 100 to players
+                else:
+                    delete {hidelock}
+                    reveal all players to all players
+                    broadcast ""
+                    broadcast "{@PrefixColor}&lHIDE: &f%sender%&7 has disabled staff visibility!"
+                    broadcast ""
+                    play sound "minecraft:block.note_block.bell" at volume 100 to players
+            else:
+                send ""
+                send "&c&lNO PERMISSION!&7 You cannot use &f/hide host&7 because you aren't a staff member."
+                send ""
+                play sound "minecraft:block.note_block.bass" at volume 100 to player
+
+#GIVE COMMANDS
+
+comamnd /giverevive [<player>] [<integer>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 or arg-2 is not set:
+            send "{@PrefixCoulor}&lPlease Use /giverevive <player> <amount>" to player
+        if arg-1 is not a player:
+            send "{@PrefixCoulor}&lPlease Specify A Player!" to player
+        if arg-2 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        else:
+            add arg-2 to {revivaltokens::%arg-2's uuid%}
+            send "" to all players
+            send "{@PrefixCoulor}&l%arg-1% Has Been Given %arg-2% Revival Tokens by %sender%!" to all players
+            send "" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to all players 
+
+comamnd /giveskip [<player>] [<integer>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 or arg-2 is not set:
+            send "{@PrefixCoulor}&lPlease Use /giverevive <player> <amount>" to player
+        if arg-1 is not a player:
+            send "{@PrefixCoulor}&lPlease Specify A Player!" to player
+        if arg-2 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        else:
+            add arg-2 to {skips::%arg-2's uuid%}
+            send "" to all players
+            send "{@PrefixCoulor}&l%arg-1% Has Been Given %arg-2% Skips Tokens by %sender%!" to all players
+            send "" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to all players 
+            
+command /giveallrevive [<integer>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        else:
+            loop all players:
+                add arg-1 to {revivaltokens::%loop-player's uuid%}
+                play sound "minecraft:block.note_block.pling" at pitch 2 to all players
+            send "" to all players
+            send "{@PrefixCoulor}&lEveryone Has Been Given %arg-1% Revival Tokens by %sender%!" to all players
+            send "" to all players
+                            
+command /giveallskip [<integer>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        else:
+            loop all players:
+                add arg-1 to {skips::%loop-player's uuid%}
+                play sound "minecraft:block.note_block.pling" at pitch 2 to all players
+            send "" to all players
+            send "{@PrefixCoulor}&lEveryone Has Been Given %arg-1% Skips by %sender%!" to all players
+            send "" to all players
+
+#Revive Stuff?
+
+command /revivesetlocation:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        set {revivelocation} to player location
+        send "{@PrefixCoulor}&lRevive Location Set!" to player
+
+command /userevive:
+    trigger:
+        if {revivaltokens::%player's uuid%} is bigger than 0:
+            remove 1 from {revivaltokens::%player's uuid%}
+            teleport player to {revivelocation}
+            send "{@PrefixCoulor}&lYou Have Been Revived!" to player
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+            if player contains {dead::*}:
+                remove {dead::*} from player
+            if player does not contain {alive::*}:
+                add {alive::*} to player
+        else:
+            send "{@PrefixCoulor}&lYou Dont Have Enough Revival Tokens!" to player
+            play sound "minecraft:block.note_block.bass" at pitch 2 to player
+
+#LISTS
+
+command /list [<text>]:
+    aliases: who
+    trigger:
+        if arg-1 is "all":
+            send "There Are %size of online players%" to player
+            send "%online players%" to player
+        if arg-1 is "alive":
+            send "There Are %size of {alive::*}%" to player
+            send "{@PrefixColor}Alive:%online players that contain {alive::*}%" to player
+        if arg-1 is "dead":
+            send "There Are %size of {dead::*}%" to player
+            send "{@PrefixColor}Dead:%online players that contain {dead::*}%" to player
+
+command /flowing:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if {flowing} is false:
+            set {flowing} to true
+            send "{@PrefixCoulor}&lFlowing Has Been Enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {flowing} is true:
+            set {flowing} to false
+            send "{@PrefixCoulor}&lFlowing Has Been Disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+            
+#Skips Stuff? could be used for parkour 
+
+command /skiplocationset:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        set {skiplocation} to player location
+        send "{@PrefixCoulor}&lSkip Location Set!" to player
+                                        
+command /useskip:
+    trigger:
+        if {skips::%player's uuid%} is bigger than 0:
+            remove 1 from {skips::%player's uuid%}
+            teleport player to {skiplocation}
+            send "{@PrefixCoulor}&lYou Have Skiped!" to player
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        else:
+            send "{@PrefixCoulor}&lYou Dont Have Enough Skips!" to player
+            play sound "minecraft:block.note_block.bass" at pitch 2 to player
+                                                  
+command /rename [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is not set:
+            send "{@PrefixCoulor}&lPlease Specify A Name!" to player
+        else:
+            set name of player's held item to arg-1
+            send "{@PrefixCoulor}&lYour Item Name Has Been Changed To %arg-1%!" to player
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /falldamage:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if {falldamage} is false:
+            set {falldamage} to true
+            send "{@PrefixCoulor}&lFall Damage Has Been Enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {falldamage} is true:
+            set {falldamage} to false
+            send "{@PrefixCoulor}&lFall Damage Has Been Disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+
+command /generaterandomnumber [<integer>] [<integer>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 or arg-2 is not set:
+            send "{@PrefixCoulor}&lPlease Use /generaterandomnumber <min> <max>" to player
+        if arg-1 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        if arg-2 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        else:
+            set {randomnumber} to random integer between arg-1 and arg-2
+            send "{@PrefixCoulor}&lYour Random Number Is %randomnumber%!" to player
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+
+command /removerevive [<player>] [<integer>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 or arg-2 is not set:
+            send "{@PrefixCoulor}&lPlease Use /removerevive <player> <amount>" to player
+        if arg-1 is not a player:
+            send "{@PrefixCoulor}&lPlease Specify A Player!" to player
+        if arg-2 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        else:
+            remove arg-2 from {revivaltokens::%arg-1's uuid%}
+            send "" to all players
+            send "{@PrefixCoulor}&l%arg-1% Has Been Removed %arg-2% Revival Tokens by %sender%!" to all players
+            send "" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to all players
+
+command /removeskips [<player>] [<integer>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 or arg-2 is not set:
+            send "{@PrefixCoulor}&lPlease Use /removeskips <player> <amount>" to player
+        if arg-1 is not a player:
+            send "{@PrefixCoulor}&lPlease Specify A Player!" to player
+        if arg-2 is not an integer:
+            send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+        else:
+            remove arg-2 from {skips::%arg-1's uuid%}
+            send "" to all players
+            send "{@PrefixCoulor}&l%arg-1% Has Been Removed %arg-2% Skips Tokens by %sender%!" to all players
+            send "" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to all players
+
+#CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE CORE
+
+command /core [<text>]:
+    aliases: zync
+    trigger:
+        if arg-1 is not set:
+            send "{@PrefixCoulor}This Server Is Running Zync Core v1.0" to player
+            send "Download At <link:https://www.spigotmc.org/resources/zync-core.114141/>" to player
+        if arg-1 is "help":
+            send "For help join the discord linked bellow and open a ticket in help or reports for a bug report or help" to player
+            send "<link:https://discord.gg/8QZQ5Z8>" to player
+        if arg-1 is "version":
+            send "{@PrefixCoulor}This Server Is Running Zync Core v1.0" to player
+            send "Download At <link:https://www.spigotmc.org/resources/zync-core.114141/>" to player
+
+command /coreadmin [<text>] [<text>] [<text>]:
+    aliases: zyncadmin 
+    permission: zynccore.admin
+    trigger:
+        if arg-1 is not set:
+            send "{@PrefixCoulor}This Server Is Running Zync Core v1.0" to player
+            send "Download At <link:https://www.spigotmc.org/resources/zync-core.114141/>" to player
+        if arg-1 is "help":
+            send "For help join the discord linked bellow and open a ticket in help or reports for a bug report or help" to player
+            send "<link:https://discord.gg/8QZQ5Z8>" to player
+        if arg-1 is "version":
+            send "{@PrefixCoulor}This Server Is Running Zync Core v1.0" to player
+            send "Download At <link:https://www.spigotmc.org/resources/zync-core.114141/>" to player
+        if arg-1 is "reload":
+            execute console command "/sk reload Zync_core"
+            send "{@PrefixCoulor}&lZync Core has been reloaded!" to player
+        if arg-1 is "set":
+            if arg-2 is "title":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A Title!" to player
+                else:
+                    set {@Title} to arg-3
+                    send "{@PrefixCoulor}&lTitle Set To %arg-3%!" to player
+            if arg-2 is "Ip":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A Ip!" to player
+                else:
+                    set {@Ip} to arg-3
+                    send "{@PrefixCoulor}&lIp Set To %arg-3%!" to player
+            if arg-2 is "HidePlugins":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@HidePlugins} to true
+                    send "{@PrefixCoulor}&lHidePlugins Set To True!" to player
+                if arg-3 is "false":
+                    set {@HidePlugins} to false
+                    send "{@PrefixCoulor}&lHidePlugins Set To False!" to player
+            if arg-2 is "CustomJoinMessage":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@CustomJoinMessage} to true
+                    send "{@PrefixCoulor}&lCustomJoinMessage Set To True!" to player
+                if arg-3 is "false":
+                    set {@CustomJoinMessage} to false
+                    send "{@PrefixCoulor}&lCustomJoinMessage Set To False!" to player
+            if arg-2 is "CustomLeaveMessage":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@CustomLeaveMessage} to true
+                    send "{@PrefixCoulor}&lCustomLeaveMessage Set To True!" to player
+                if arg-3 is "false":
+                    set {@CustomLeaveMessage} to false
+                    send "{@PrefixCoulor}&lCustomLeaveMessage Set To False!" to player
+            if arg-2 is "CustomDeathMessage":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@CustomDeathMessage} to true
+                    send "{@PrefixCoulor}&lCustomDeathMessage Set To True!" to player
+                if arg-3 is "false":
+                    set {@CustomDeathMessage} to false
+                    send "{@PrefixCoulor}&lCustomDeathMessage Set To False!" to player
+            if arg-2 is "NightVisonOnJoin":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@NightVisonOnJoin} to true
+                    send "{@PrefixCoulor}&lNightVisonOnJoin Set To True!" to player
+                if arg-3 is "false":
+                    set {@NightVisonOnJoin} to false
+                    send "{@PrefixCoulor}&lNightVisonOnJoin Set To False!" to player
+            if arg-2 is "AnnounceTitle":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A Title!" to player
+                else:
+                    set {@AnnounceTitle} to arg-3
+                    send "{@PrefixCoulor}&lAnnounceTitle Set To %arg-3%!" to player
+            if arg-2 is "PrefixCoulor":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A Coulor(In Format &)!" to player
+                else:
+                    set {@PrefixCoulor} to arg-3
+                    send "{@PrefixCoulor}&lPrefix Coulor Set To %arg-3%!" to player
+            if arg-2 is "ScoreBoardCoulor":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A Coulor(In Format &)!" to player
+                else:
+                    set {@ScoreBoardCoulor} to arg-3
+                    send "{@PrefixCoulor}&lScoreBoard Coulor Set To %arg-3%!" to player
+            if arg-2 is "SkipsOnJoin":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+                else:
+                    set {@SkipsOnJoin} to arg-3
+                    send "{@PrefixCoulor}&lSkipsOnJoin Set To %arg-3%!" to player
+            if arg-2 is "RevivesOnJoin":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A Number!" to player
+                else:
+                    set {@RevivesOnJoin} to arg-3
+                    send "{@PrefixCoulor}&lRevivesOnJoin Set To %arg-3%!" to player
+            if arg-2 is "MuteNosises":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@MuteNosises} to true
+                    send "{@PrefixCoulor}&lMuteNosises Set To True!" to player
+                if arg-3 is "false":
+                    set {@MuteNosises} to false
+                    send "{@PrefixCoulor}&lMuteNosises Set To False!" to player
+            if arg-2 is "PlayerJoinAlive":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@PlayerJoinAlive} to true
+                    send "{@PrefixCoulor}&lPlayerJoinAlive Set To True!" to player
+                if arg-3 is "false":
+                    set {@PlayerJoinAlive} to false
+                    send "{@PrefixCoulor}&lPlayerJoinAlive Set To False!" to player
+            if arg-2 is "DisableOpCommand":
+                if arg-3 is not set:
+                    send "{@PrefixCoulor}&lPlease Specify A True Or False!" to player
+                if arg-3 is "true":
+                    set {@DisableOpCommand} to true
+                    send "{@PrefixCoulor}&lDisableOpCommand Set To True!" to player
+                if arg-3 is "false":
+                    set {@DisableOpCommand} to false
+                    send "{@PrefixCoulor}&lDisableOpCommand Set To False!" to player
+
+command /event [<text>] [<text>]:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if arg-1 is not set:
+            send "{@PrefixCoulor}&lPlease Specify A start to start a avent stop to stop a event or set to set a event!" to player
+        if arg-1 is "start":
+            if {eventstatus::*} is false:
+                set {eventstatus::*} to true
+                send "{@PrefixCoulor}&lEvent Has Been Started!" to all players
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player
+            else:
+                send "{@PrefixCoulor}&lEvent Has Already Been Started!" to player
+                play sound "minecraft:block.note_block.bass" at pitch 2 to player
+        if arg-1 is "stop":
+            if {eventstatus::*} is true:
+                set {eventstatus::*} to false
+                send "{@PrefixCoulor}&lEvent Has Been Stopped!" to all players
+                play sound "minecraft:block.note_block.pling" at pitch 2 to player
+            else:
+                send "{@PrefixCoulor}&lEvent Has Already Been Stopped!" to player
+                play sound "minecraft:block.note_block.bass" at pitch 2 to player
+        if arg-1 is "set":
+            set {event::*} to arg-2
+            send "{@PrefixCoulor}&lEvent Has Been Set To %arg-2%!" to all players
 
 
 
 
 
+
+
+            
+#TabCompletes
+
+on tab complete of "/reviveall", "/killall", "/killalive", "/killdead", "/tpdead", "/tpall", "/healall":
+    if player has permission "zynccore.admin":
+        set tab completions for position 1 to "slow" and "fast"
+        
+on tab complete of "/timer":
+    if player has permission "zynccore.admin":
+        set tab completions for position 2 to "seconds" and "minutes"
+
+on tab complete of "/hide":
+    if player has permission "zynccore.admin":
+        set tab completions for position 1 to "all" and "host"
+
+on tab complete of "/list":
+    set tab completions for position 1 to "all" and "alive" and "dead"
+
+on tab complete of "/core":
+    set tab completions for position 1 to "help" and "version"
+
+on tab complete of "/coreadmin":
+    if player has permission "zynccore.admin":
+        set tab completions for position 1 to "help" and "version" and "reload" and "set"
+        if arg-2 is "set":
+            set tab completions for position 2 to "title" and "Ip" and "HidePlugins" and "CustomJoinMessage" and "CustomLeaveMessage" and "CustomDeathMessage" and "NightVisonOnJoin" and "AnnounceTitle" and "PrefixCoulor" and "ScoreBoardCoulor" and "SkipsOnJoin" and "RevivesOnJoin" and "MuteNosises" and "PlayerJoinAlive" and "DisableOpCommand"
+
+on tab complete of "/event":
+    if player has permission "zynccore.admin":
+        set tab completions for position 1 to "start" and "stop" and "set"
+        
