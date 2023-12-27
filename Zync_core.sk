@@ -65,7 +65,7 @@ on join:
         apply night vision without particles to player for 1 year
     while player is online:
         set title of player's scoreboard to "{@Title}"
-        set line 17 of player's scoreboard to ""
+        set line 17  of player's scoreboard to ""
         set line 16 of player's scoreboard to "{@ScoreBoardCoulor}Weclome: %player%"
         set line 15 of player's scoreboard to ""
         set line 14 of player's scoreboard to "{@ScoreBoardCoulor}&lPlayer:"
@@ -178,8 +178,26 @@ on block spread:
 on falldamage:
     if {falldamage} is false:
         cancel event
+on shoot:
+    if {rideenderpearl} is true:
+        projectile exists
+        if projectile is ender pearl:
+            make shooter ride the projectile
+    else:
 
-#COMMANDS
+on projectile hit:
+    if {teleportingarrows} is true:
+        projectile exists
+        if projectile is arrow:
+            teleport shooter to projectile
+    else:
+
+
+
+
+
+
+        #COMMANDS
 
 command /mutechat:
     permission: zynccore.admin
@@ -1136,14 +1154,42 @@ command /event [<text>] [<text>]:
             set {event::*} to arg-2
             send "{@PrefixCoulor}&lEvent Has Been Set To %arg-2%!" to all players
 
+command /rideenderpearl:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if {rideenderpearl} is false:
+            set {rideenderpearl} to true
+            send "{@PrefixCoulor}&lRide Enderpearl Has Been Enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {rideenderpearl} is true:
+            set {rideenderpearl} to false
+            send "{@PrefixCoulor}&lRide Enderpearl Has Been Disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
 
-
+command /teleportingarrows:
+    permission: zynccore.admin
+    permission message: &cYou Dont Have Permission To Use This Command!
+    trigger:
+        if {teleportingarrows} is false:
+            set {teleportingarrows} to true
+            send "{@PrefixCoulor}&lTeleporting Arrows Has Been Enabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
+        if {teleportingarrows} is true:
+            set {teleportingarrows} to false
+            send "{@PrefixCoulor}&lTeleporting Arrows Has Been Disabled!" to all players
+            play sound "minecraft:block.note_block.pling" at pitch 2 to player
 
 
 
 
             
-#TabCompletes
+
+
+
+
+
+            #TabCompletes
 
 on tab complete of "/reviveall", "/killall", "/killalive", "/killdead", "/tpdead", "/tpall", "/healall":
     if player has permission "zynccore.admin":
